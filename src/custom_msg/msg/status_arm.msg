@@ -1,0 +1,5 @@
+string junta
+float64 pulsos_setpoint
+float64 pulsos_contados
+float64 pulsos_erro
+float64 output_PID
