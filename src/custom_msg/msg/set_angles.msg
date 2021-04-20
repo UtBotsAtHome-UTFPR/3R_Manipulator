@@ -4,4 +4,5 @@ float64 set_PUN
 bool 	set_CLAW
 
 bool 	reset
+bool 	retry
 bool 	emergency_stop

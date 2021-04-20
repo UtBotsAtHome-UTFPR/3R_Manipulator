@@ -14,20 +14,24 @@ int main(int argc, char **argv)
 	int mode;
 
 	//while(ros::ok()){
-	while(mode != 5){
+	while(mode != 7){
 
 		cout << "Digite o modo de operação:\n";
 		cout << "1: Somente Ombro.\n";
 		cout << "2: Somente Cotovelo.\n";
 		cout << "3: Somente Punho.\n";
 		cout << "4: Todos.\n";
-		cout << "5: Sair.\n";
+		cout << "5: Reset.\n";
+		cout << "6: Retry.\n";
+		cout << "7: Sair.\n";
 		cin >> mode;
 
 		system("clear");
 
 		switch(mode){
 			case 1:
+					msg.reset = false;
+					msg.retry = false;
 					cout << "Ângulo do Ombro:\n";
 					cin >> msg.set_OMB;
 					if(msg.set_OMB == 0){
@@ -38,6 +42,8 @@ int main(int argc, char **argv)
 						msg.emergency_stop = false;}
 					break;
 			case 2:
+					msg.reset = false;
+					msg.retry = false;
 					cout << "Ângulo do Cotovelo:\n";
 					cin >> msg.set_COT;
 					if(msg.set_COT == 0){
@@ -48,6 +54,8 @@ int main(int argc, char **argv)
 						msg.emergency_stop = false;}
 					break;
 			case 3:
+					msg.reset = false;
+					msg.retry = false;
 					cout << "Ângulo do Punho:\n";
 					cin >> msg.set_PUN;
 					if(msg.set_PUN == 0){
@@ -58,6 +66,8 @@ int main(int argc, char **argv)
 						msg.emergency_stop = false;}
 					break;
 			case 4:
+					msg.reset = false;
+					msg.retry = false;
 					cout << "Ângulo do Ombro:\n";
 					cin >> msg.set_OMB;
 					if(msg.set_OMB == 0){
@@ -85,13 +95,38 @@ int main(int argc, char **argv)
 					else{
 						msg.emergency_stop = false;}
 					break;
+			case 5:
+					msg.reset = true;
+					msg.retry = false;
+					if(msg.set_PUN == 0){
+						msg.emergency_stop = true;
+						pub.publish(msg);
+						ros::spinOnce();
+						cout << "Reset enviado!\n";}
+					else{
+						msg.emergency_stop = false;}
+					break;
+			case 6:
+					msg.reset = false;
+					msg.retry = true;
+					if(msg.set_PUN == 0){
+						msg.emergency_stop = true;
+						pub.publish(msg);
+						ros::spinOnce();
+						cout << "Retry enviado!\n";}
+					else{
+						msg.emergency_stop = false;}
+					break;
+			case 7:
+					msg.reset = false;
+					msg.retry = false;
+					break;
 		}
-
+		
 		pub.publish(msg);
 		ros::spinOnce();
 		looprate.sleep();
-
-		cout << "\n\n\n";
+		cout << "\n\n";
 	}
 	return 0;
 }
