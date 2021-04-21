@@ -14,16 +14,17 @@ int main(int argc, char **argv)
 	int mode;
 
 	//while(ros::ok()){
-	while(mode != 7){
+	while(mode != 8){
 
 		cout << "Digite o modo de operação:\n";
 		cout << "1: Somente Ombro.\n";
 		cout << "2: Somente Cotovelo.\n";
 		cout << "3: Somente Punho.\n";
 		cout << "4: Todos.\n";
-		cout << "5: Reset.\n";
-		cout << "6: Retry.\n";
-		cout << "7: Sair.\n";
+		cout << "5: Abre/fecha a Garra.\n";
+		cout << "6: Reset.\n";
+		cout << "7: Retry.\n";
+		cout << "8: Sair.\n";
 		cin >> mode;
 
 		system("clear");
@@ -40,6 +41,8 @@ int main(int argc, char **argv)
 						ros::spinOnce();}
 					else{
 						msg.emergency_stop = false;}
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 			case 2:
 					msg.reset = false;
@@ -52,6 +55,8 @@ int main(int argc, char **argv)
 						ros::spinOnce();}
 					else{
 						msg.emergency_stop = false;}
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 			case 3:
 					msg.reset = false;
@@ -64,6 +69,8 @@ int main(int argc, char **argv)
 						ros::spinOnce();}
 					else{
 						msg.emergency_stop = false;}
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 			case 4:
 					msg.reset = false;
@@ -94,38 +101,45 @@ int main(int argc, char **argv)
 						ros::spinOnce();}
 					else{
 						msg.emergency_stop = false;}
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 			case 5:
-					msg.reset = true;
+					msg.reset = false;
 					msg.retry = false;
-					if(msg.set_PUN == 0){
-						msg.emergency_stop = true;
-						pub.publish(msg);
-						ros::spinOnce();
-						cout << "Reset enviado!\n";}
-					else{
-						msg.emergency_stop = false;}
+
+					if(msg.set_GAR){
+						msg.set_GAR = false;
+						cout << "Garra Fechando.\n";
+					}else{
+						msg.set_GAR = true;
+						cout << "Garra Abrindo.\n";
+					}
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 			case 6:
-					msg.reset = false;
-					msg.retry = true;
-					if(msg.set_PUN == 0){
-						msg.emergency_stop = true;
-						pub.publish(msg);
-						ros::spinOnce();
-						cout << "Retry enviado!\n";}
-					else{
-						msg.emergency_stop = false;}
+					msg.reset = true;
+					msg.retry = false;
+					msg.set_OMB = 0;
+					msg.set_COT = 0;
+					msg.set_PUN = 0;
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 			case 7:
 					msg.reset = false;
+					msg.retry = true;
+					pub.publish(msg);
+					ros::spinOnce();
+					break;
+			case 8:
+					msg.reset = true;
 					msg.retry = false;
+					pub.publish(msg);
+					ros::spinOnce();
 					break;
 		}
-		
-		pub.publish(msg);
-		ros::spinOnce();
-		looprate.sleep();
 		cout << "\n\n";
 	}
 	return 0;
