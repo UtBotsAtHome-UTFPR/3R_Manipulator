@@ -1,15 +1,8 @@
+Como Preparar o Ambiente de Trabalho para Trabalhar com o Manipulador 3R do LASER: Beckman Coulter ORCA Robotic Arm
+-------------------------------------
 
-*****************************************************************************************
-*   Como Preparar o Ambiente de Trabalho para Trabalhar com o Manipulador 3R do LASER   *
-*																						*
-*							Beckman Coulter ORCA Robotic Arm.							*
-*****************************************************************************************
-
-
-
---------------------
------ HARDWARE -----
---------------------
+HARDWARE
+-------------------------------------
 
 O manipulador possui 3 DoF dispostos de forma planar. Cada DoF é assosiado a um motor, além de um motor para o acionamento da garra. Os motortes suportam até 24V porém, para operação segura, sugere-se alimentação com 12V DC, a qual será regulada de 0V a 12V pela largura do PWM nos Arduinos. Há 2 Arduinos que controlam a estrutura, ambos acoplados em uma placa Monster Motor Shield que possuem duas ponte-H cada. Cada ponte-H controla o acionamento de um motor em ambos os sentidos.
 
@@ -28,10 +21,7 @@ Não há sensores do tipo potenciômetro para indicar a posição do manipulador
 	Punho: -133 graus
 
 
-
-
--------------------------------------
------ COMUNICAÇÃO COM O ARDUINO -----
+COMUNICAÇÃO COM O ARDUINO
 -------------------------------------
 
 Nesta sessão apresenta-se o passo a passo para realizar a comunicação com múltiplos Arduinos com ROS pelo USB. Também menciona-se detalhes para a gravação de novos firmwares diferentes dos originais, caso seja necessário.
@@ -202,14 +192,12 @@ DESCREVER O FUNCIONAMENTO DOS TÓPICOS.
 
 
 
-
+FALTA FAZER
 -----------------------
------ FALTA FAZER -----
------------------------
+Calibrar a relação pulsos por grau.
 
-Função "fim-de-curso" - Bolar alguma lógica para que o Arduino saiba que bateu num fim de curso. Ou seja, se o motor está ligado mas ficou tipo 0,3 segundos sem pulso nos encoders então a peça está travada. dá pra fazer um timer que se reseta toda vez que um pulso novo chega, o que significa que o motor está girando. Se o timer estourar e o motor está ligado, significa que está travado.
+Calibrar o ângulo real com o offset inicial.
 
-Função "reset" - Assim que liga o sistema, aciona os motores na direção que recolhe o braço. Caso tenha chance de bugar, faz antes o ombro, depois o cotovelo, depois o punho e por último a garra. Talvez crie um campo na mensagem pro arduino do punho saber que o outro terminou, ou tanto faz isso se vê na prática como fica. Vai usar o fim-de-curso pra saber quando está resetado. No final se "zera" o valor das variáveis que contam os pulsos. Essa será a ORIGEM do sistema de controle.
+Adicionar rotinas do I e D.
 
-Fazer o programa em Cpp saber quando os motores dos dois arduinos estão ok. pode ser por ali que se controla o início do reset do segundo arduino, talvez.
-
+Testar a garra.
