@@ -1,5 +1,9 @@
 string junta
-float64 pulsos_setpoint
-float64 pulsos_contados
-float64 pulsos_erro
-float64 output_PID
+float32 pulsos_setpoint
+float32 pulsos_contados
+float32 pulsos_erro
+float32 output_P
+float32 output_I
+float32 output_D
+float32 output_PID
+float32 loop_time

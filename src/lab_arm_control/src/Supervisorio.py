@@ -37,6 +37,7 @@ l.addWidget(btn1,0,0)
 l.addWidget(btn2,1,0)
 l.addWidget(btn3,2,0)
 
+
 #Seta o layout montado e abre a janela.
 cw.setLayout(l)
 mw.show()
