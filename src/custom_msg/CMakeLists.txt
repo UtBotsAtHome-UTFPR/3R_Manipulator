@@ -10,6 +10,7 @@ add_message_files(
   FILES
   set_angles.msg
   status_arm.msg
+  reset_COT.msg
 )
 
 generate_messages(
