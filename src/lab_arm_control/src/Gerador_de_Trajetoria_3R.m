@@ -85,9 +85,9 @@ clc;
         pseudo = J'*(inv(J*J'));
 
         q_dot = pseudo*(desired_dot(:,k) + K*erro) + (eye(3) - pseudo*J)*q_zero(:,k);
-
+        
+        q_plot(:,k) = theta;
         q_dot_plot(:,k) = double(q_dot);
-        q_plot2(:,k) = theta;
 
         theta = [theta(1) + q_dot(1)*interval;
                  theta(2) + q_dot(2)*interval;
@@ -98,26 +98,64 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT DA TRAJETÓRIA PLANEJADA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    for k=1:length(q_plot2)
-        [manip2(k),~] = manipulability(q_plot2(:,k));
-    end
-    figure;
-    hold on;
-    plot(manip2,'k');
-    axis ([0 t_max*1000 0.6 1]);
-    title('Manipulabilidade');
-
-    for k = 1:30:length(eff_2')
-        x = [J1_2(1,k), J2_2(1,k), J3_2(1,k), eff_2(1,k)];
-        y = [J1_2(2,k), J2_2(2,k), J3_2(2,k), eff_2(2,k)];
-
-        figure(2)
-        plot(x,y,'-o','Linewidth',3,'Color','k');hold on;
-        plot(desired(1,:),desired(2,:),'Color','r');hold on;
-        title('Trajetória Gerada');
-        hold off;
-
-        axis ([-0.3 0.5 -0.2 0.6]);
-
-        pause(interval)
-    end
+%     for k=1:length(q_plot)
+%         [manip(k),~] = manipulability(q_plot(:,k));
+%     end
+%     figure;
+%     hold on;
+%     plot(manip,'k');
+%     axis ([0 t_max*1000 0.6 1]);
+%     title('Manipulabilidade');
+% 
+%     for k = 1:30:length(eff_2')
+%         x = [J1_2(1,k), J2_2(1,k), J3_2(1,k), eff_2(1,k)];
+%         y = [J1_2(2,k), J2_2(2,k), J3_2(2,k), eff_2(2,k)];
+% 
+%         figure(2)
+%         plot(x,y,'-o','Linewidth',3,'Color','k');hold on;
+%         plot(desired(1,:),desired(2,:),'Color','r');hold on;
+%         title('Trajetória Gerada');
+%         hold off;
+% 
+%         axis ([-0.3 0.5 -0.2 0.6]);
+% 
+%         pause(interval)
+%     end
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONFIGURAÇÃO DO ROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+    
+    %Cria a mensagem e inicia o publicador.
+    rosinit;
+    msg = rosmessage('custom_msg/set_angles');
+    pub = rospublisher('/cmd_3R')
+    
+    %Converte todo o vetor de ângulos da trajetória para radianos
+    joints = deg2rad(q_plot);
+    
+    %Mandar a mensagem cada vez que o timeout dela chegar.
+    msg.set_OMB = joints(1,1);
+    msg.set_COT = joints(2,1);
+    msg.set_PUN = joints(3,1);
+    
+    send(pub,msg);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
