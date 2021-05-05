@@ -17,7 +17,7 @@ clc;
     raio = [0.10; 0.10];
 
     %Tempo total da trajetória, em segundos.
-    t_max = 2;
+    t_max = 20;
     
     %Quantas voltas vai dar, dentro do tempo máximo.
     voltas = 1;
@@ -108,6 +108,8 @@ clc;
 %     title('Manipulabilidade');
 % 
 %     for k = 1:30:length(eff_2')
+%         tic
+%         
 %         x = [J1_2(1,k), J2_2(1,k), J3_2(1,k), eff_2(1,k)];
 %         y = [J1_2(2,k), J2_2(2,k), J3_2(2,k), eff_2(2,k)];
 % 
@@ -119,7 +121,9 @@ clc;
 % 
 %         axis ([-0.3 0.5 -0.2 0.6]);
 % 
-%         pause(interval)
+%         while(toc < interval)
+%             %do nothing.
+%         end
 %     end
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -127,19 +131,28 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     
     %Cria a mensagem e inicia o publicador.
+    rosshutdown;
     rosinit;
     msg = rosmessage('custom_msg/set_angles');
-    pub = rospublisher('/cmd_3R')
+    pub = rospublisher('/cmd_3R');
     
     %Converte todo o vetor de ângulos da trajetória para radianos
-    joints = deg2rad(q_plot);
+    joints = rad2deg(q_plot);
     
     %Mandar a mensagem cada vez que o timeout dela chegar.
-    msg.set_OMB = joints(1,1);
-    msg.set_COT = joints(2,1);
-    msg.set_PUN = joints(3,1);
-    
-    send(pub,msg);
+    for k=1:length(joints)
+        tic
+        
+        msg.SetOMB = joints(1,k);
+        msg.SetCOT = joints(2,k);
+        msg.SetPUN = joints(3,k);
+        
+        while(toc < interval)
+            %do nothing.
+        end
+        send(pub,msg);
+    end
+   
     
     
     
