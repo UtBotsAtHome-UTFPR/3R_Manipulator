@@ -11,7 +11,7 @@ clc;
     a     = [0.25; 0.25; 0.07];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.2; 0.2];
+    centro = [0.35; 0.05];
 
     %Raio da trajetória [rx ;ry];
     raio = [0.10; 0.10];
