@@ -11,10 +11,10 @@ clc;
     a     = [0.25; 0.25; 0.07];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.35; 0.05];
+    centro = [0.20; 0.1];
 
     %Raio da trajetória [rx ;ry];
-    raio = [0.10; 0.10];
+    raio = [0.05; 0.05];
 
     %Tempo total da trajetória, em segundos.
     t_max = 20;
@@ -47,7 +47,13 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GERAÇÃO DA TRAJETÓRIA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    
+    % Objetivo secundário... Maximizar a manipulabilidade.
+    w = (1/2)*(sin(theta(2))^2 + (sin(theta(3))^2));
+    w_dot = [0;
+             cos(theta(2))*sin(theta(2));
+             cos(theta(3))*sin(theta(3))];
+    
     erro = zeros(2,1);
 
     for k=1:length(t)
@@ -66,7 +72,7 @@ clc;
                         sin(theta(1)+theta(2)+theta(3)) cos(theta(1)+theta(2)+theta(3)) 0;
                         0 0 1],'ZYZ');
 
-        ori(k) = euler(3);       
+        ori(k) = euler(3);
         erro_pos(k) = norm(desired(:,k)-eff_2(:,k));
 
         erro = desired(:,k)-eff_2(:,k);
@@ -98,60 +104,60 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT DA TRAJETÓRIA PLANEJADA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%     for k=1:length(q_plot)
-%         [manip(k),~] = manipulability(q_plot(:,k));
-%     end
-%     figure;
-%     hold on;
-%     plot(manip,'k');
-%     axis ([0 t_max*1000 0.6 1]);
-%     title('Manipulabilidade');
-% 
-%     for k = 1:30:length(eff_2')
-%         tic
-%         
-%         x = [J1_2(1,k), J2_2(1,k), J3_2(1,k), eff_2(1,k)];
-%         y = [J1_2(2,k), J2_2(2,k), J3_2(2,k), eff_2(2,k)];
-% 
-%         figure(2)
-%         plot(x,y,'-o','Linewidth',3,'Color','k');hold on;
-%         plot(desired(1,:),desired(2,:),'Color','r');hold on;
-%         title('Trajetória Gerada');
-%         hold off;
-% 
-%         axis ([-0.3 0.5 -0.2 0.6]);
-% 
-%         while(toc < interval)
-%             %do nothing.
-%         end
-%     end
+    for k=1:length(q_plot)
+        [manip(k),~] = manipulability(q_plot(:,k));
+    end
+    figure;
+    hold on;
+    plot(manip,'k');
+    axis ([0 t_max*1000 0.6 1]);
+    title('Manipulabilidade');
+
+    for k = 1:30:length(eff_2')
+        tic
+        
+        x = [J1_2(1,k), J2_2(1,k), J3_2(1,k), eff_2(1,k)];
+        y = [J1_2(2,k), J2_2(2,k), J3_2(2,k), eff_2(2,k)];
+
+        figure(2)
+        plot(x,y,'-o','Linewidth',3,'Color','k');hold on;
+        plot(desired(1,:),desired(2,:),'Color','r');hold on;
+        title('Trajetória Gerada');
+        hold off;
+
+        axis ([-0.3 0.5 -0.2 0.6]);
+
+        while(toc < interval)
+            %do nothing.
+        end
+    end
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONFIGURAÇÃO DO ROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     
-    %Cria a mensagem e inicia o publicador.
-    rosshutdown;
-    rosinit;
-    msg = rosmessage('custom_msg/set_angles');
-    pub = rospublisher('/cmd_3R');
-    
-    %Converte todo o vetor de ângulos da trajetória para radianos
-    joints = rad2deg(q_plot);
-    
-    %Mandar a mensagem cada vez que o timeout dela chegar.
-    for k=1:length(joints)
-        tic
-        
-        msg.SetOMB = joints(1,k);
-        msg.SetCOT = joints(2,k);
-        msg.SetPUN = joints(3,k);
-        
-        while(toc < interval)
-            %do nothing.
-        end
-        send(pub,msg);
-    end
+%     %Cria a mensagem e inicia o publicador.
+%     rosshutdown;
+%     rosinit;
+%     msg = rosmessage('custom_msg/set_angles');
+%     pub = rospublisher('/cmd_3R');
+%     
+%     %Converte todo o vetor de ângulos da trajetória para radianos
+%     joints = rad2deg(q_plot);
+%     
+%     %Mandar a mensagem cada vez que o timeout dela chegar.
+%     for k=1:length(joints)
+%         tic
+%         
+%         msg.SetOMB = joints(1,k);
+%         msg.SetCOT = joints(2,k);
+%         msg.SetPUN = joints(3,k);
+%         
+%         while(toc < interval)
+%             %do nothing.
+%         end
+%         send(pub,msg);
+%     end
    
     
     
