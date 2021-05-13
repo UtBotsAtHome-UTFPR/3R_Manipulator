@@ -7,3 +7,4 @@ float32 output_I
 float32 output_D
 float32 output_PID
 float32 loop_time
+bool IsDone

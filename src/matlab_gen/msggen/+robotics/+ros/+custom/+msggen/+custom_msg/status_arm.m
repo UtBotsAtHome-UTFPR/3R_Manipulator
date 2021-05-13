@@ -12,7 +12,7 @@ classdef status_arm < robotics.ros.Message
     end
     
     properties (Constant, Hidden)
-        MD5Checksum = '99c108981eeb33c52ca0bf2ebc1245eb' % The MD5 Checksum of the message definition
+        MD5Checksum = 'c3c5e83e349a8305c77eff5da188ae4a' % The MD5 Checksum of the message definition
     end
     
     properties (Access = protected)
@@ -29,11 +29,12 @@ classdef status_arm < robotics.ros.Message
         OutputD
         OutputPID
         LoopTime
+        IsDone
     end
     
     properties (Constant, Hidden)
-        PropertyList = {'Junta', 'LoopTime', 'OutputD', 'OutputI', 'OutputP', 'OutputPID', 'PulsosContados', 'PulsosErro', 'PulsosSetpoint'} % List of non-constant message properties
-        ROSPropertyList = {'junta', 'loop_time', 'output_D', 'output_I', 'output_P', 'output_PID', 'pulsos_contados', 'pulsos_erro', 'pulsos_setpoint'} % List of non-constant ROS message properties
+        PropertyList = {'IsDone', 'Junta', 'LoopTime', 'OutputD', 'OutputI', 'OutputP', 'OutputPID', 'PulsosContados', 'PulsosErro', 'PulsosSetpoint'} % List of non-constant message properties
+        ROSPropertyList = {'IsDone', 'junta', 'loop_time', 'output_D', 'output_I', 'output_P', 'output_PID', 'pulsos_contados', 'pulsos_erro', 'pulsos_setpoint'} % List of non-constant ROS message properties
     end
     
     methods
@@ -191,6 +192,18 @@ classdef status_arm < robotics.ros.Message
             
             obj.JavaMessage.setLoopTime(looptime);
         end
+        
+        function isdone = get.IsDone(obj)
+            %get.IsDone Get the value for property IsDone
+            isdone = logical(obj.JavaMessage.getIsDone);
+        end
+        
+        function set.IsDone(obj, isdone)
+            %set.IsDone Set the value for property IsDone
+            validateattributes(isdone, {'logical', 'numeric'}, {'nonempty', 'scalar'}, 'status_arm', 'IsDone');
+            
+            obj.JavaMessage.setIsDone(isdone);
+        end
     end
     
     methods (Access = protected)
@@ -213,6 +226,7 @@ classdef status_arm < robotics.ros.Message
             cpObj.OutputD = obj.OutputD;
             cpObj.OutputPID = obj.OutputPID;
             cpObj.LoopTime = obj.LoopTime;
+            cpObj.IsDone = obj.IsDone;
         end
         
         function reload(obj, strObj)
@@ -226,6 +240,7 @@ classdef status_arm < robotics.ros.Message
             obj.OutputD = strObj.OutputD;
             obj.OutputPID = strObj.OutputPID;
             obj.LoopTime = strObj.LoopTime;
+            obj.IsDone = strObj.IsDone;
         end
     end
     
@@ -248,6 +263,7 @@ classdef status_arm < robotics.ros.Message
             strObj.OutputD = obj.OutputD;
             strObj.OutputPID = obj.OutputPID;
             strObj.LoopTime = obj.LoopTime;
+            strObj.IsDone = obj.IsDone;
         end
     end
     
