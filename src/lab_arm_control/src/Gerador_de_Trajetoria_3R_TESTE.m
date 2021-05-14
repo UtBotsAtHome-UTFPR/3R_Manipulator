@@ -8,18 +8,18 @@ clc;
 
     %Parâmetros D-H do manipulador.
     theta = [  pi; -pi/2; -pi/2];
-    a     = [0.24;  0.24;  0.07];
+    a     = [0.235;  0.245;  0.065];
     alpha = [   0;     0;     0];
     d     = [   0;     0;     0];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.35; 0.05];
+    centro = [0.35; 0.15];
 
     %Raio da trajetória [rx ;ry];
-    raio = [0.05; 0.05];
+    raio = [0.13; 0.13];
 
     %Tempo total da trajetória, em segundos.
-    t_max = 10;
+    t_max = 20;
     
     %Quantas voltas vai dar, dentro do tempo máximo.
     voltas = 1;
@@ -155,7 +155,7 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT DA TRAJETÓRIA PLANEJADA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-PLOT = 1;
+PLOT = 0;
 
 if(PLOT==1)
     for k=1:length(q_plot)
@@ -191,7 +191,7 @@ if(PLOT==1)
 
     hold off
 
-    for k = 1:30:length(eff')
+    for k = 1:100:length(eff')
         tic
 
         x = [J1(1,k), J2(1,k), J3(1,k), eff(1,k)];
@@ -226,7 +226,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONFIGURAÇÃO DO ROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     
-ROS = 0;
+ROS = 1;
 
 if(ROS == 1)
     %Cria a mensagem e inicia o publicador.
