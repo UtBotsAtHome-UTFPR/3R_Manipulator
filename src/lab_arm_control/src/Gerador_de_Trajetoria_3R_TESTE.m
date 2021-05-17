@@ -13,7 +13,7 @@ clc;
     d     = [   0;     0;     0];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.33; 0.17];
+    centro = [0.35; 0.13];
 
     %Raio da trajetória [rx ;ry];
     raio = [0.13; 0.13];
@@ -22,7 +22,7 @@ clc;
     t_max = 20;
     
     %Quantas voltas vai dar, dentro do tempo máximo.
-    voltas = 1;
+    voltas = 2;
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GERAÇÃO DA TRAJETÓRIA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
