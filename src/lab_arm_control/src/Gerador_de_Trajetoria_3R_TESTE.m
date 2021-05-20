@@ -13,16 +13,16 @@ clc;
     d     = [   0;     0;     0];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.35; 0.13];
+    centro = [0.35; 0.20];
 
     %Raio da trajetória [rx ;ry];
     raio = [0.13; 0.13];
 
     %Tempo total da trajetória, em segundos.
-    t_max = 20;
+    t_max = 90;
     
     %Quantas voltas vai dar, dentro do tempo máximo.
-    voltas = 2;
+    voltas = 1;
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GERAÇÃO DA TRAJETÓRIA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -253,6 +253,8 @@ if(ROS == 1)
     msg.SetPUN = joints(3,1);
     send(pub,msg);
     disp('Mandou o starter!')
+    
+    pause(1);
     
     %Lê o status das juntas até todas estarem OK.
     ready = false;
