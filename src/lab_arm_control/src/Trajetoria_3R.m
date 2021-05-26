@@ -8,18 +8,18 @@ clc;
 
     %Parâmetros D-H do manipulador.
     theta = [  pi; -pi/2; -pi/2];
-    a     = [0.24;  0.24;  0.07];
+    a     = [0.235;  0.245;  0.065];
     alpha = [   0;     0;     0];
     d     = [   0;     0;     0];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.35; 0.05];
+    centro = [0.35; 0.20];
 
     %Raio da trajetória [rx ;ry];
-    raio = [0.05; 0.05];
+    raio = [0.13; 0.13];
 
     %Tempo total da trajetória, em segundos.
-    t_max = 10;
+    t_max = 90;
     
     %Quantas voltas vai dar, dentro do tempo máximo.
     voltas = 1;
@@ -191,46 +191,55 @@ if(PLOT==1)
 
     hold off
 
-    for k = 1:30:length(eff')
-        tic
+%     for k = 1:100:length(eff')
+%         tic
+% 
+%         x = [J1(1,k), J2(1,k), J3(1,k), eff(1,k)];
+%         y = [J1(2,k), J2(2,k), J3(2,k), eff(2,k)];
+% 
+%         start_quiver = [eff(1,k) eff(2,k)];
+% 
+%         end_quiver         = [eff(1,k)+ 0.10*cos(yaw(k)) eff(2,k)+ 0.10*sin(yaw(k))];
+%         end_quiver_desired = [eff(1,k)+ 0.15*cos(desired(3,k)) eff(2,k)+ 0.15*sin(desired(3,k))];
+% 
+%         len_quiver = end_quiver-start_quiver;
+%         len_quiver_desired = end_quiver_desired-start_quiver;
+% 
+%         figure(2)
+%         plot(x,y,'-o','Linewidth',3,'Color','k');hold on
+%         plot(desired(1,:),desired(2,:),'Color','r');hold on
+%         seta = quiver(start_quiver(1),start_quiver(2),len_quiver(1),len_quiver(2),'Color','k');
+%         seta.MaxHeadSize = 10;
+%         seta2 = quiver(start_quiver(1),start_quiver(2),len_quiver_desired(1),len_quiver_desired(2),'Color','r');
+%         seta2.MaxHeadSize = 10;
+%         hold off;
+% 
+%         axis ([-0.2 0.5 -0.2 0.5]);
+% 
+%         while(toc < interval)
+%             %do nothing.
+%         end
+%     end
 
-        x = [J1(1,k), J2(1,k), J3(1,k), eff(1,k)];
-        y = [J1(2,k), J2(2,k), J3(2,k), eff(2,k)];
-
-        start_quiver = [eff(1,k) eff(2,k)];
-
-        end_quiver         = [eff(1,k)+ 0.10*cos(yaw(k)) eff(2,k)+ 0.10*sin(yaw(k))];
-        end_quiver_desired = [eff(1,k)+ 0.15*cos(desired(3,k)) eff(2,k)+ 0.15*sin(desired(3,k))];
-
-        len_quiver = end_quiver-start_quiver;
-        len_quiver_desired = end_quiver_desired-start_quiver;
-
-        figure(2)
-        plot(x,y,'-o','Linewidth',3,'Color','k');hold on
-        plot(desired(1,:),desired(2,:),'Color','r');hold on
-        seta = quiver(start_quiver(1),start_quiver(2),len_quiver(1),len_quiver(2),'Color','k');
-        seta.MaxHeadSize = 10;
-        seta2 = quiver(start_quiver(1),start_quiver(2),len_quiver_desired(1),len_quiver_desired(2),'Color','r');
-        seta2.MaxHeadSize = 10;
-        hold off;
-
-        axis ([-0.2 0.5 -0.2 0.5]);
-
-        while(toc < interval)
-            %do nothing.
-        end
-    end
+    %Converte todo o vetor de ângulos da trajetória para radianos
+    joints = rad2deg(q_plot);
+%     figure(3)
+%     plot(joints(1,:)); hold on;
+%     plot(joints(2,:)); hold on;
+%     plot(joints(3,:)); hold on;
 end
+
+
+
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONFIGURAÇÃO DO ROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     
-ROS = 0;
+ROS = 1;
 
 if(ROS == 1)
     %Cria a mensagem e inicia o publicador.
-    
     rosshutdown;
     rosinit('http://jonathan-notebook:11311/');
     
@@ -244,15 +253,14 @@ if(ROS == 1)
     subCOT = rossubscriber('/status_COT');
     subPUN = rossubscriber('/status_PUN');
     
-    %Converte todo o vetor de ângulos da trajetória para radianos
-    joints = rad2deg(q_plot);
-    
     %Manda o primeiro ponto da trajetória, para iniciar com erro zero.
     msg.SetOMB = joints(1,1);
     msg.SetCOT = joints(2,1);
     msg.SetPUN = joints(3,1);
     send(pub,msg);
     disp('Mandou o starter!')
+    
+    pause(1);
     
     %Lê o status das juntas até todas estarem OK.
     ready = false;
@@ -269,24 +277,35 @@ if(ROS == 1)
     disp('Começou a trajetória!')
     
     %Inicia a trajetória mandando a mensagem cada vez que o timeout dela chegar.
-    spacing = 100;
-    for k=100:spacing:length(joints)
+    spacing = 10;
+    j=1;
+    for k=spacing:spacing:length(joints)
         tic
         
         msg.SetOMB = joints(1,k);
         msg.SetCOT = joints(2,k);
         msg.SetPUN = joints(3,k);
         
+        joint_sent(1,j) = msg.SetOMB;
+        joint_sent(2,j) = msg.SetCOT;
+        joint_sent(3,j) = msg.SetPUN;
+        
         while(toc < interval*spacing)
             %do nothing.
         end
         send(pub,msg);
+        
+        j=j+1;
     end
     
     disp('Terminou a trajetória!')
 end
-    
-    
+
+% figure(4)
+% plot(joint_sent(1,:)); hold on;
+% plot(joint_sent(2,:)); hold on;
+% plot(joint_sent(3,:)); hold on;
+%     
     
     
     
