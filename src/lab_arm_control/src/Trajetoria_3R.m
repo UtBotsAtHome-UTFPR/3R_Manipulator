@@ -25,9 +25,10 @@ clc;
     voltas = 1;
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GERAÇÃO DA TRAJETÓRIA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% GERAÇÃO DA TRAJETÓRIA - ESPAÇO OPERACIONAL %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    disp('Iniciou a geração de trajetória no espaço operacional...')
+    
     syms t;
     loop_time = voltas/t_max;
 
@@ -63,9 +64,11 @@ clc;
 %     desired_dot = pd_dot;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GERAÇÃO DA TRAJETÓRIA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% %%%%%%%%% GERAÇÃO DA TRAJETÓRIA - ESPAÇO DAS JUNTAS %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
+    disp('Iniciou a geração de trajetória no espaço das juntas...')
+
     %Inicializa os valores de theta para o início da trajetória.
     erro = ones(3,1);
     while (norm(erro) > 0.001)
@@ -99,7 +102,7 @@ clc;
                  theta(3) + q_dot(3)*interval];
     end
     
-    starter = rad2deg(theta)
+    starter = rad2deg(theta);
     
     % Objetivo secundário... Maximizar a manipulabilidade.
     w = (1/2)*(sin(theta(2))^2 + (sin(theta(3))^2));
@@ -150,12 +153,22 @@ clc;
         theta = [theta(1) + q_dot(1)*interval;
                  theta(2) + q_dot(2)*interval;
                  theta(3) + q_dot(3)*interval];
+             
+        percent = k/length(t);
+%         clc;
+%         disp('geração de trajetória no espaço das juntas...')
+%         fprintf('%.2f completo.\n', percent)
     end
+    
+    %Converte todo o vetor de ângulos da trajetória para graus.
+    joints = rad2deg(q_plot);
+    
+    disp('Trajetória gerada com sucesso!')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PLOT DA TRAJETÓRIA PLANEJADA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-PLOT = 1;
+PLOT = 0;
 
 if(PLOT==1)
     for k=1:length(q_plot)
@@ -191,42 +204,35 @@ if(PLOT==1)
 
     hold off
 
-%     for k = 1:100:length(eff')
-%         tic
-% 
-%         x = [J1(1,k), J2(1,k), J3(1,k), eff(1,k)];
-%         y = [J1(2,k), J2(2,k), J3(2,k), eff(2,k)];
-% 
-%         start_quiver = [eff(1,k) eff(2,k)];
-% 
-%         end_quiver         = [eff(1,k)+ 0.10*cos(yaw(k)) eff(2,k)+ 0.10*sin(yaw(k))];
-%         end_quiver_desired = [eff(1,k)+ 0.15*cos(desired(3,k)) eff(2,k)+ 0.15*sin(desired(3,k))];
-% 
-%         len_quiver = end_quiver-start_quiver;
-%         len_quiver_desired = end_quiver_desired-start_quiver;
-% 
-%         figure(2)
-%         plot(x,y,'-o','Linewidth',3,'Color','k');hold on
-%         plot(desired(1,:),desired(2,:),'Color','r');hold on
-%         seta = quiver(start_quiver(1),start_quiver(2),len_quiver(1),len_quiver(2),'Color','k');
-%         seta.MaxHeadSize = 10;
-%         seta2 = quiver(start_quiver(1),start_quiver(2),len_quiver_desired(1),len_quiver_desired(2),'Color','r');
-%         seta2.MaxHeadSize = 10;
-%         hold off;
-% 
-%         axis ([-0.2 0.5 -0.2 0.5]);
-% 
-%         while(toc < interval)
-%             %do nothing.
-%         end
-%     end
+    for k = 1:100:length(eff')
+        tic
 
-    %Converte todo o vetor de ângulos da trajetória para radianos
-    joints = rad2deg(q_plot);
-%     figure(3)
-%     plot(joints(1,:)); hold on;
-%     plot(joints(2,:)); hold on;
-%     plot(joints(3,:)); hold on;
+        x = [J1(1,k), J2(1,k), J3(1,k), eff(1,k)];
+        y = [J1(2,k), J2(2,k), J3(2,k), eff(2,k)];
+
+        start_quiver = [eff(1,k) eff(2,k)];
+
+        end_quiver         = [eff(1,k)+ 0.10*cos(yaw(k)) eff(2,k)+ 0.10*sin(yaw(k))];
+        end_quiver_desired = [eff(1,k)+ 0.15*cos(desired(3,k)) eff(2,k)+ 0.15*sin(desired(3,k))];
+
+        len_quiver = end_quiver-start_quiver;
+        len_quiver_desired = end_quiver_desired-start_quiver;
+
+        figure(2)
+        plot(x,y,'-o','Linewidth',3,'Color','k');hold on
+        plot(desired(1,:),desired(2,:),'Color','r');hold on
+        seta = quiver(start_quiver(1),start_quiver(2),len_quiver(1),len_quiver(2),'Color','k');
+        seta.MaxHeadSize = 10;
+        seta2 = quiver(start_quiver(1),start_quiver(2),len_quiver_desired(1),len_quiver_desired(2),'Color','r');
+        seta2.MaxHeadSize = 10;
+        hold off;
+
+        axis ([-0.2 0.5 -0.2 0.5]);
+
+        while(toc < interval)
+            %do nothing.
+        end
+    end
 end
 
 
@@ -265,9 +271,16 @@ if(ROS == 1)
     %Lê o status das juntas até todas estarem OK.
     ready = false;
     while(~ready)
+        
         IsDoneOMB = receive(subOMB,10);
         IsDoneCOT = receive(subCOT,10);
         IsDonePUN = receive(subPUN,10);
+        
+        clc
+        disp('Os três precisam estar com valor 1:')
+        fprintf('Ombro: %i\n', IsDoneOMB.IsDone)
+        fprintf('Cotovelo: %i\n', IsDoneCOT.IsDone)
+        fprintf('Punho: %i\n', IsDonePUN.IsDone)
         
         if(IsDoneOMB.IsDone && IsDoneCOT.IsDone && IsDonePUN.IsDone)
             ready = true;
