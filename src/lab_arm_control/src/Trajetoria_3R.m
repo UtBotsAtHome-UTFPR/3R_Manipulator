@@ -7,19 +7,20 @@ clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     %Parâmetros D-H do manipulador.
-    theta = [  pi; -pi/2; -pi/2];
+%     theta = [  pi; -pi/2; -pi/2];
+    theta = [  deg2rad(-40); deg2rad(145); deg2rad(-133)];
     a     = [0.235;  0.245;  0.065];
     alpha = [   0;     0;     0];
     d     = [   0;     0;     0];
 
     %Centro da trajetória [x0 ;y0];
-    centro = [0.35; 0.20];
+    centro = [0.36; 0.18];
 
     %Raio da trajetória [rx ;ry];
-    raio = [0.13; 0.13];
+    raio = [0.10; 0.10];
 
     %Tempo total da trajetória, em segundos.
-    t_max = 90;
+    t_max = 60;
     
     %Quantas voltas vai dar, dentro do tempo máximo.
     voltas = 1;
@@ -270,21 +271,22 @@ if(ROS == 1)
     
     %Lê o status das juntas até todas estarem OK.
     ready = false;
-    while(~ready)
-        
-        IsDoneOMB = receive(subOMB,10);
-        IsDoneCOT = receive(subCOT,10);
-        IsDonePUN = receive(subPUN,10);
-        
-        clc
-        disp('Os três precisam estar com valor 1:')
-        fprintf('Ombro: %i\n', IsDoneOMB.IsDone)
-        fprintf('Cotovelo: %i\n', IsDoneCOT.IsDone)
-        fprintf('Punho: %i\n', IsDonePUN.IsDone)
-        
-        if(IsDoneOMB.IsDone && IsDoneCOT.IsDone && IsDonePUN.IsDone)
-            ready = true;
-        end
+    tic
+    while(toc < 5)
+%         
+%         IsDoneOMB = receive(subOMB,10);
+%         IsDoneCOT = receive(subCOT,10);
+%         IsDonePUN = receive(subPUN,10);
+%         
+%         clc
+%         disp('Os três precisam estar com valor 1:')
+%         fprintf('Ombro: %i\n', IsDoneOMB.IsDone)
+%         fprintf('Cotovelo: %i\n', IsDoneCOT.IsDone)
+%         fprintf('Punho: %i\n', IsDonePUN.IsDone)
+%         
+%         if(IsDoneOMB.IsDone && IsDoneCOT.IsDone && IsDonePUN.IsDone)
+%             ready = true;
+%         end
     end
     
     disp('Começou a trajetória!')
